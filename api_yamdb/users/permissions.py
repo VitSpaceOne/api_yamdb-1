@@ -1,38 +1,40 @@
 from rest_framework import permissions
 
 
-class AdminOrReadOnly(permissions.BasePermission):
+class BaseUserPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
+        )
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.user.role == 'admin'
+            request.method in permissions.SAFE_METHODS
+            or request.user.role in self.allowed_roles
             or request.user.is_superuser
         )
 
 
-class AdminOrModeratorOrReadOnly(permissions.BasePermission):
+class AdminOrReadOnly(BaseUserPermission):
 
-    def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS
-
-    def has_object_permission(self, request, view, obj):
-        return (
-            request.user.role in ('admin', 'moderator')
-            or request.user.is_superuser
-        )
+    allowed_roles = ('admin',)
 
 
-class AdminOrModeratorOrOwnerOrReadOnly(permissions.BasePermission):
+class AdminOrModeratorOrReadOnly(BaseUserPermission):
 
-    def has_permission(self, request, view):
-        return request.method in permissions.SAFE_METHODS
+    allowed_roles = ('admin', 'moderator')
+
+
+class AdminOrModeratorOrOwnerOrReadOnly(BaseUserPermission):
+
+    allowed_roles = ('admin', 'moderator')
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.user.role in ('admin', 'moderator')
-            or request.user.is_superuser
+            request.method in permissions.SAFE_METHODS
             or request.user == obj.author
+            or request.user.role in self.allowed_roles
+            or request.user.is_superuser
         )
