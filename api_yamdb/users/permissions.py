@@ -1,21 +1,26 @@
 from rest_framework import permissions
 
 
-class IsSuperuser(permissions.BasePermission):
+class Superuser(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_superuser
 
 
-class IsAdmin(permissions.BasePermission):
+class Admin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.role == 'admin'
 
 
-class IsModertor(permissions.BasePermission):
+class Modertor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.role == 'moderator'
 
 
-class IsOwner(permissions.BasePermission):
+class Owner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user == obj.author
+
+
+class ReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.method in permissions.SAFE_METHODS
