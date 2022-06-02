@@ -26,11 +26,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = (Admin,)
 
-    @action(
-        detail=False,
-        methods=['get', 'patch'],
-        permission_classes=[IsAuthenticated]
-        )
+    @action(methods=['get', 'patch'], permission_classes=[IsAuthenticated])
     def me(self, request):
         user = User.objects.get(user=request.user)
         serializer = self.get_serializer(user)
