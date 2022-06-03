@@ -5,7 +5,7 @@ from users.models import User
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
     def __str__(self):
@@ -13,8 +13,11 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Title(models.Model):
@@ -24,12 +27,17 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
-        related_name='titles'
+        on_delete=models.SET_NULL,
+        related_name='titles',
+        blank=True,
+        null=True
     )
     genre = models.ManyToManyField(
         Genre,
         through='GenreTitle'
+    )
+    description = models.TextField(
+        blank=True
     )
 
     def __str__(self):
@@ -37,7 +45,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews'
@@ -49,7 +57,6 @@ class Review(models.Model):
         related_name='reviews'
     )
     score = models.IntegerField(
-        default=1,
         validators=[
             MaxValueValidator(10),
             MinValueValidator(1)
@@ -60,12 +67,20 @@ class Review(models.Model):
         auto_now_add=True
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_title_author'
+            )
+        ]
+
     def __str__(self):
         return self.text[:15]
 
 
 class Comment(models.Model):
-    review_id = models.ForeignKey(
+    review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name='comments'
@@ -85,14 +100,22 @@ class Comment(models.Model):
 
 
 class GenreTitle(models.Model):
-    title_id = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE
     )
-    genre_id = models.ForeignKey(
+    genre = models.ForeignKey(
         Genre,
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'genre'],
+                name='unique_title_genre'
+            )
+        ]
+
     def __str__(self):
-        return f'{self.title_id} {self.genre_id}'
+        return f'{self.title} {self.genre}'
