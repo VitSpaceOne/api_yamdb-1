@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 
 from .permissions import Admin
-from .serializers import UserSerializer
+from .serializers import UserSerializer, SignUpSerializer
 
 User = get_user_model()
 
@@ -26,7 +26,11 @@ class UsersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = (Admin,)
 
-    @action(methods=['get', 'patch'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get', 'patch'],
+        permission_classes=[IsAuthenticated]
+    )
     def me(self, request):
         user = User.objects.get(user=request.user)
         serializer = self.get_serializer(user)
