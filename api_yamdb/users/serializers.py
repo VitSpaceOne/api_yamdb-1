@@ -6,21 +6,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class SignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-
-    )
-    username = serializers.CharField
-
-    def validate_email(self, value):
-        pass
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError("Выберите другое имя")
-        return value
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
@@ -29,11 +14,13 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'bio',
-            'role'
+            'role',
+            'confirmation_code'
         )
+        read_only_fields = ('confirmation_code',)
         model = User
 
     def validate_username(self, value):
         if value == 'me':
-            raise serializers.ValidationError("Выберите другое имя")
+            raise serializers.ValidationError("Choose another name")
         return value
