@@ -17,19 +17,21 @@ from users.permissions import Owner, Modertor, Superuser, Admin, ReadOnly
 class CategoriesViewSet(ListCreateDeleteViewSet):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
+    pagination_class = PageNumberPagination
 
 
 class GenresViewSet(ListCreateDeleteViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
+    pagination_class = PageNumberPagination
 
 
 class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     queryset = Title.objects.all()
     serializer_class = TitlesSerializer
-    pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     permission_classes = [Superuser | Admin | ReadOnly]
+    pagination_class = PageNumberPagination
 
 
 class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
