@@ -4,7 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class ListCreateDeleteViewSet(
-    mixins.ListModelMixin, mixins.CreateModelMixin, 
+    mixins.ListModelMixin, mixins.CreateModelMixin,
     mixins.DestroyModelMixin, viewsets.GenericViewSet
 ):
     permission_classes = [Superuser | Admin | ReadOnly]
