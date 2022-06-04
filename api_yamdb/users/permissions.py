@@ -8,17 +8,23 @@ class Superuser(permissions.BasePermission):
 
 class Admin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == 'admin'
+        if request.user.is_authenticated:
+            return request.user.role == 'admin'
+        return False
 
 
 class Modertor(permissions.BasePermission):
     def has_permission(self, request, view):
-        request.user.role == 'moderator'
+        if request.user.is_authenticated:
+            request.user.role == 'moderator'
+        return False
 
 
 class Owner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user == obj.author
+        if request.user.is_authenticated:
+            return request.user == obj.author
+        return False
 
 
 class ReadOnly(permissions.BasePermission):
