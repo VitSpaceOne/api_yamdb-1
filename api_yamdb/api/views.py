@@ -33,7 +33,7 @@ class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
 
 class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = ReviewsSerializer
-    permission_classes = (Superuser | Admin | ReadOnly | Owner | Modertor)
+    permission_classes = [Superuser | Admin | ReadOnly | Owner | Modertor]
 
     def get_queryset(self):
         title = get_object_or_404(self.kwargs.get('title_id'))
@@ -47,7 +47,7 @@ class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
 
 class CommentViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = CommentsSerializer
-    permission_classes = (Superuser | Admin | ReadOnly | Owner | Modertor)
+    permission_classes = [Superuser | Admin | ReadOnly | Owner | Modertor]
 
     def get_queryset(self):
         review = get_object_or_404(self.kwargs.get('review_id'))
