@@ -29,6 +29,7 @@ class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = TitlesSerializer
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
+    permission_classes = [Superuser | Admin | ReadOnly]
 
 
 class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):

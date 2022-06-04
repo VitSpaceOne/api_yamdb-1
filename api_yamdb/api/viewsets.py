@@ -15,6 +15,5 @@ class ListCreateDeleteViewSet(
 
 class ListCreateRetrieveUpdateDeleteViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = [Superuser | Admin | ReadOnly]
     filter_backends = (filters.SearchFilter)
     search_fields = ('genre__slug', 'category__slug', 'name', 'year')
