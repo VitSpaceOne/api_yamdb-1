@@ -58,9 +58,11 @@ def retrieve_token(request):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = (Admin | Superuser)
+    permission_classes = [Admin | Superuser]
+    lookup_field = 'username'
 
     @action(
         detail=False,
@@ -68,6 +70,20 @@ class UsersViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def me(self, request):
-        user = User.objects.get(user=request.user)
-        serializer = self.get_serializer(user)
-        return Response(serializer.data)
+        user = User.objects.get(pk=request.user.id)
+        serializer_class = self.get_serializer_class()
+
+        if request.method == 'GET':
+            serializer = serializer_class(user, context={'request': request})
+            return Response(serializer.data)
+
+        if serializer.is_valid():
+            serializer = serializer_class(
+                user,
+                partial=True,
+                context={'request': request}
+            )
+            serializer.save()
+            return Response(serializer.data)
+
+        return Response(serializer.errors)
