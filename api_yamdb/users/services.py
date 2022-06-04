@@ -1,6 +1,11 @@
-import random
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
+GENERATOR = PasswordResetTokenGenerator()
 
 
-def generate_confirmation_code():
-    code = random.randint(100000, 999999)
-    return code
+def generate_token(user):
+    return GENERATOR.make_token(user)
+
+
+def check_token(user, token):
+    return GENERATOR.check_token(user, token)

@@ -2,13 +2,15 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
+
 
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 
-from .permissions import Admin
+from .permissions import Admin, Superuser
 from .serializers import UserSerializer
-from .services import generate_confirmation_code
+from .services import generate_token, check_token
 
 User = get_user_model()
 
@@ -16,19 +18,27 @@ User = get_user_model()
 @api_view(['POST'])
 def sign_up(request):
     serializer = UserSerializer(data=request.data)
+
     if serializer.is_valid():
-        confirmation_code = generate_confirmation_code()
-        serializer.save(confirmation_code=confirmation_code)
+
+        username = request.data['username']
+        email = request.data['email']
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            user = serializer.save()
+        token = generate_token(user)
         send_mail(
             'Yamdb confirmation code',
-            f'{confirmation_code}',
+            f'{token}',
             'auth@yamdb.com',
-            [f'{serializer.data["email"]}']
+            [f'{email}']
         )
+
         return Response(
             {
-                "username": serializer.data['username'],
-                "email": serializer.data['email']
+                "username": username,
+                "email": email
             },
             status=status.HTTP_200_OK
         )
@@ -37,13 +47,20 @@ def sign_up(request):
 
 @api_view(['POST'])
 def retrieve_token(request):
-    pass
+    user = User.objects.get(username=request.data['username'])
+    if check_token(user, request.data['confirmation_code']):
+        access = AccessToken.for_user(user)
+        return Response(
+            {
+                'token': str(access)
+            }
+        )
 
 
 class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    permission_classes = (Admin,)
+    permission_classes = (Admin | Superuser)
 
     @action(
         detail=False,

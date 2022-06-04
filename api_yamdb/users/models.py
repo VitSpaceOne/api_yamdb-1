@@ -22,4 +22,3 @@ class User(AbstractUser):
         choices=ROLES,
         default='user'
     )
-    confirmation_code = models.IntegerField()
