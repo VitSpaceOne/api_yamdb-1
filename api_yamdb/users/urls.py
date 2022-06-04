@@ -9,7 +9,7 @@ router = SimpleRouter()
 router.register('users', UsersViewSet, basename='users')
 
 urlpatterns = [
-    path('auth/signup/', sign_up, name='sign_up'),
-    path('auth/token/', retrieve_token, name='retrieve_token'),
-    path('', include(router.urls))
+    path('v1/auth/signup/', sign_up, name='sign_up'),
+    path('v1/auth/token/', retrieve_token, name='retrieve_token'),
+    path('v1/', include(router.urls))
 ]
