@@ -2,6 +2,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import AccessToken
 
 
@@ -63,6 +64,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     permission_classes = [Admin | Superuser]
     lookup_field = 'username'
+    pagination_class = PageNumberPagination
 
     @action(
         detail=False,
