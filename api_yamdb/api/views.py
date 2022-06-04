@@ -1,27 +1,17 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
-from users.permissions import Admin, ReadOnly, Owner
 from django_filters.rest_framework import DjangoFilterBackend
+from .viewsets import (
+    ListCreateDeleteViewSet,
+    ListCreateRetrieveUpdateDeleteViewSet
+)
 from .serializers import (
-    CategoriesSerializer, CommentsSerializer, GenresSerializer, ReviewsSerializer, TitlesSerializer
+    CategoriesSerializer, CommentsSerializer,
+    GenresSerializer, ReviewsSerializer, TitlesSerializer
 )
 
-from reviews.models import Category, Genre, Title, Review
-
-
-class ListCreateDeleteViewSet(
-    mixins.ListModelMixin, mixins.CreateModelMixin, 
-    mixins.DestroyModelMixin, viewsets.GenericViewSet
-):
-    permission_classes = (
-        Admin,
-        IsAuthenticatedOrReadOnly
-    )
-
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    search_fields = ('name', 'slug')
+from reviews.models import Category, Genre, Title
+from users.permissions import Owner, Modertor
 
 
 class CategoriesViewSet(ListCreateDeleteViewSet):
@@ -34,16 +24,6 @@ class GenresViewSet(ListCreateDeleteViewSet):
     serializer_class = GenresSerializer
 
 
-class ListCreateRetrieveUpdateDeleteViewSet(
-    mixins.ListModelMixin, mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin, viewsets.GenericViewSet
-):
-    permission_classes = [Owner&Admin|ReadOnly]
-    filter_backends = (filters.SearchFilter)
-    search_fields = ('genre__slug', 'category__slug', 'name', 'year')
-
-
 class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     queryset = Title.objects.all()
     serializer_class = TitlesSerializer
@@ -53,8 +33,27 @@ class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
 
 class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = ReviewsSerializer
+    permission_classes = (Owner | Modertor)
 
-      
+    def get_queryset(self):
+        title = get_object_or_404(self.kwargs.get('title_id'))
+        queryset = title.reviews.all()
+        return queryset
+
+    def get_perform_create(self, serializer):
+        title = get_object_or_404(self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
+
 
 class CommentViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = CommentsSerializer
+    permission_classes = (Owner | Modertor)
+
+    def get_queryset(self):
+        review = get_object_or_404(self.kwargs.get('review_id'))
+        queryset = review.comments.all()
+        return queryset
+
+    def get_perform_create(self, serializer):
+        review = get_object_or_404(self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)

@@ -24,17 +24,20 @@ class GenresSerializer(serializers.ModelSerializer):
         model = Genre
         fields = ('name', 'slug')
 
+
 class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
         fields = '__all__'
 
+
 class ReviewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
         fields = '__all__'
+
 
 class CommentsSerializer(serializers.ModelSerializer):
 
