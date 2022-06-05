@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 
 from .permissions import Admin, Superuser
 from .serializers import UserSerializer, UserSelfSerializer
@@ -48,14 +49,21 @@ def sign_up(request):
 
 @api_view(['POST'])
 def retrieve_token(request):
-    user = User.objects.get(username=request.data['username'])
-    if check_token(user, request.data['confirmation_code']):
-        access = AccessToken.for_user(user)
-        return Response(
-            {
-                'token': str(access)
-            }
-        )
+    if (
+        'username' in request.data
+        and 'confirmation_code' in request.data
+    ):
+        user = get_object_or_404(User, username=request.data['username'])
+        if check_token(user, request.data['confirmation_code']):
+            access = AccessToken.for_user(user)
+            return Response(
+                {
+                        'token': str(access)
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
