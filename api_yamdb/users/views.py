@@ -84,15 +84,15 @@ class UsersViewSet(viewsets.ModelViewSet):
         serializer_class = UserSelfSerializer
 
         if request.method == 'GET':
-            serializer = serializer_class(user, context={'request': request})
+            serializer = serializer_class(user)
             return Response(serializer.data)
 
-        if serializer.is_valid():
-            serializer = serializer_class(
+        serializer = serializer_class(
                 user,
                 partial=True,
-                context={'request': request}
+                data=request.data
             )
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
 
