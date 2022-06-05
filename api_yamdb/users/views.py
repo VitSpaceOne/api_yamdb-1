@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 
 from .permissions import Admin, Superuser
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserSelfSerializer
 from .services import generate_token, check_token
 
 User = get_user_model()
@@ -73,7 +73,7 @@ class UsersViewSet(viewsets.ModelViewSet):
     )
     def me(self, request):
         user = User.objects.get(pk=request.user.id)
-        serializer_class = self.get_serializer_class()
+        serializer_class = UserSelfSerializer
 
         if request.method == 'GET':
             serializer = serializer_class(user, context={'request': request})
