@@ -8,7 +8,7 @@ class ListCreateDeleteViewSet(
     mixins.DestroyModelMixin, viewsets.GenericViewSet
 ):
     permission_classes = [Superuser | Admin | ReadOnly]
-
+    lookup_field = 'slug'
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ('name', 'slug')
 
