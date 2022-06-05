@@ -25,17 +25,8 @@ class GenresSerializer(serializers.ModelSerializer):
 
 
 class TitlesSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
-        slug_field='slug',
-        many=False,
-        queryset=Category.objects.all()
-    )
-    genre = serializers.SlugRelatedField(
-        slug_field='slug',
-        many=True,
-        required=False,
-        queryset=Genre.objects.all()
-    )
+    category = CategoriesSerializer(read_only=True)
+    genre = GenresSerializer(read_only=True, many=True)
 
     class Meta:
         model = Title
@@ -51,14 +42,14 @@ class TitlesSerializer(serializers.ModelSerializer):
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
-    auhtor = serializers.SlugRelatedField(
+    author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
     )
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('title',)
 
     def validate(self, data):
@@ -76,7 +67,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
     def validate_score(self, value):
         if 0 >= value >= 10:
             raise serializers.ValidationError(
-                'Оценка'
+                'Оценка за пределами допустимого диапазона'
             )
         return value
 
