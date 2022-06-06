@@ -10,6 +10,7 @@ from .serializers import (
     CategoriesSerializer, CommentsSerializer,
     GenresSerializer, ReviewsSerializer, TitlesSerializer
 )
+from .filters import TitleFilter
 
 from reviews.models import Category, Genre, Title, Review
 from users.permissions import Owner, Modertor, Superuser, Admin, ReadOnly
@@ -33,6 +34,22 @@ class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     filter_backends = (DjangoFilterBackend,)
     permission_classes = [Superuser | Admin | ReadOnly]
     pagination_class = PageNumberPagination
+    filterset_class = TitleFilter
+
+    def perform_create(self, serializer):
+        category = Category.objects.get(slug=self.request.data.get('category'))
+        genre = Genre.objects.filter(
+            slug__in=self.request.data.getlist('genre')
+        )
+        serializer.save(category=category, genre=genre)
+
+    def perform_update(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        category = Category.objects.get(slug=self.request.data.get('category'))
+        genre = Genre.objects.filter(
+            slug__in=self.request.data.getlist('genre')
+        )
+        serializer.save(title, partial=True, category=category, genre=genre)
 
 
 class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):

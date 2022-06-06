@@ -32,6 +32,25 @@ class TitlesSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
 
+    def validate_genre(self, value):
+        for slug in value:
+            if Genre.objects.get(slug=slug).exists():
+                continue
+            return value
+        raise serializers.ValidationError(
+            "Указанный жанр не существует"
+        )
+
+    def validate_category(self, value):
+        if (
+            self.request.data.get('category')
+            and Category.objects.get(slug=value).exists()
+        ):
+            return value
+        raise serializers.ValidationError(
+            "Указанная категория не существует"
+        )
+
     def validate_year(self, value):
         current_year = datetime.date.today().year
         if value > current_year:
@@ -58,7 +77,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
                 self.context['request'].parser_context['kwargs']['title_id']
             )
             user = self.context['request'].user
-            if user.reviews.filter(title_id=title_id).exist():
+            if user.reviews.get(title_id=title_id).exist():
                 raise serializers.ValidationError(
                     'Возможно оставить только один отзыв на произведение'
                 )
