@@ -1,4 +1,6 @@
 import datetime
+from wsgiref.util import request_uri
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from django.db.models import Avg
@@ -40,9 +42,7 @@ class TitlesSerializer(serializers.ModelSerializer):
             if Genre.objects.get(slug=slug).exists():
                 continue
             return value
-        raise serializers.ValidationError(
-            "Указанный жанр не существует"
-        )
+        raise serializers.ValidationError("Указанный жанр не существует")
 
     def validate_category(self, value):
         if (
@@ -50,9 +50,7 @@ class TitlesSerializer(serializers.ModelSerializer):
             and Category.objects.get(slug=value).exists()
         ):
             return value
-        raise serializers.ValidationError(
-            "Указанная категория не существует"
-        )
+        raise serializers.ValidationError("Указанная категория не существует")
 
     def validate_year(self, value):
         current_year = datetime.date.today().year
@@ -78,6 +76,18 @@ class ReviewsSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('author',)
+
+    def validate(self, data):
+        request = self.context.get('request')
+        title_id = request.parser_context.get('kwargs').get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        user = request.user
+        if (
+            user.reviews.filter(title=title).exists()
+            and request.method == 'POST'
+        ):
+            raise serializers.ValidationError("Нельзя оставить второй отзыв")
+        return data
 
     def validate_score(self, value):
         if 0 >= value >= 10:

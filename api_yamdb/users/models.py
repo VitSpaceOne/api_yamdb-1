@@ -23,3 +23,6 @@ class User(AbstractUser):
         choices=ROLES,
         default='user'
     )
+
+    class Meta:
+        ordering = ['-id']

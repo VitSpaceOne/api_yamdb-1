@@ -39,11 +39,9 @@ class Moderator(permissions.BasePermission):
 
 class User(permissions.BasePermission):
     def has_permission(self, request, view):
-        print('has_permission')
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        print('has_object_permission')
         return request.user == obj.author
 
 

@@ -8,6 +8,9 @@ class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.name
 
@@ -15,6 +18,9 @@ class Category(models.Model):
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -39,6 +45,9 @@ class Title(models.Model):
     description = models.TextField(
         blank=True
     )
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -68,6 +77,7 @@ class Review(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'author'],
@@ -95,6 +105,9 @@ class Comment(models.Model):
         auto_now_add=True
     )
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.text[:15]
 
@@ -110,6 +123,7 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'genre'],
