@@ -1,41 +1,30 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from reviews.models import Category, Genre, Review, Title
+from users.permissions import Admin, Moderator, ReadOnly, Superuser, User
 
-from .viewsets import (
-    ListCreateDeleteViewSet,
-    ListCreateRetrieveUpdateDeleteViewSet
-)
-from .serializers import (
-    CategoriesSerializer, CommentsSerializer,
-    GenresSerializer, ReviewsSerializer, TitlesSerializer
-)
 from .filters import TitleFilter
+from .serializers import (CategoriesSerializer, CommentsSerializer,
+                          GenresSerializer, ReviewsSerializer,
+                          TitlesSerializer)
+from .viewsets import CategoryGenreViewSet, TitleReviewCommentViewSet
 
-from reviews.models import Category, Genre, Title, Review
-from users.permissions import User, Moderator, Superuser, Admin, ReadOnly
 
-
-class CategoriesViewSet(ListCreateDeleteViewSet):
+class CategoriesViewSet(CategoryGenreViewSet):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
-    pagination_class = PageNumberPagination
-    permission_classes = [Superuser | Admin | ReadOnly]
 
 
-class GenresViewSet(ListCreateDeleteViewSet):
+class GenresViewSet(CategoryGenreViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
-    pagination_class = PageNumberPagination
-    permission_classes = [Superuser | Admin | ReadOnly]
 
 
-class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
+class TitlesViewSet(TitleReviewCommentViewSet):
     queryset = Title.objects.all()
     serializer_class = TitlesSerializer
     filter_backends = (DjangoFilterBackend,)
     permission_classes = [Superuser | Admin | ReadOnly]
-    pagination_class = PageNumberPagination
     filterset_class = TitleFilter
 
     def perform_create(self, serializer):
@@ -53,7 +42,7 @@ class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
         serializer.save(category=category, genre=genre)
 
 
-class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
+class ReviewViewSet(TitleReviewCommentViewSet):
     serializer_class = ReviewsSerializer
     permission_classes = [Superuser | Admin | Moderator | User | ReadOnly]
 
@@ -66,7 +55,7 @@ class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
         serializer.save(author=self.request.user, title=title)
 
 
-class CommentViewSet(ListCreateRetrieveUpdateDeleteViewSet):
+class CommentViewSet(TitleReviewCommentViewSet):
     serializer_class = CommentsSerializer
     permission_classes = [Superuser | Admin | Moderator | User | ReadOnly]
 

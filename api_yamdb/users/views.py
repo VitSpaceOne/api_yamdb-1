@@ -1,18 +1,16 @@
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view, action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
-from rest_framework_simplejwt.tokens import AccessToken
-
-
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from rest_framework import status, viewsets
+from rest_framework.decorators import action, api_view
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 
 from .permissions import Admin, Superuser
-from .serializers import UserSerializer, UserSelfSerializer
-from .services import generate_token, check_token
+from .serializers import UserSelfSerializer, UserSerializer
+from .services import check_token, generate_token
 
 User = get_user_model()
 

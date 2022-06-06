@@ -1,14 +1,8 @@
 import datetime
+
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from reviews.models import (
-    Category,
-    Genre,
-    Title,
-    Review,
-    Comment,
-)
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
@@ -36,18 +30,21 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     def validate_genre(self, value):
         for slug in value:
-            if Genre.objects.get(slug=slug).exists():
-                continue
-            return value
-        raise serializers.ValidationError("Указанный жанр не существует")
+            if not Genre.objects.get(slug=slug).exists():
+                raise serializers.ValidationError(
+                    "Указанный жанр не существует"
+                )
+        return value
 
     def validate_category(self, value):
-        if (
+        if not (
             self.request.data.get('category')
             and Category.objects.get(slug=value).exists()
         ):
-            return value
-        raise serializers.ValidationError("Указанная категория не существует")
+            raise serializers.ValidationError(
+                "Указанная категория не существует"
+            )
+        return value
 
     def validate_year(self, value):
         current_year = datetime.date.today().year
@@ -58,7 +55,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         return value
 
     def get_rating(self, obj):
-        return obj.rating
+        return obj.avg_rating
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
@@ -78,8 +75,8 @@ class ReviewsSerializer(serializers.ModelSerializer):
         title = get_object_or_404(Title, id=title_id)
         user = request.user
         if (
-            user.reviews.filter(title=title).exists()
-            and request.method == 'POST'
+            request.method == 'POST'
+            and user.reviews.filter(title=title).exists()
         ):
             raise serializers.ValidationError("Нельзя оставить второй отзыв")
         return data

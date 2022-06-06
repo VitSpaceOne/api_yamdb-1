@@ -1,6 +1,5 @@
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from django.db import models
 from users.models import User
 
 
@@ -28,9 +27,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
-    year = models.IntegerField(
-        'Дата создания произведения',
-    )
+    year = models.IntegerField()
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -38,13 +35,8 @@ class Title(models.Model):
         blank=True,
         null=True
     )
-    genre = models.ManyToManyField(
-        Genre,
-        through='GenreTitle'
-    )
-    description = models.TextField(
-        blank=True
-    )
+    genre = models.ManyToManyField(Genre, through='GenreTitle')
+    description = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-id']
@@ -53,7 +45,7 @@ class Title(models.Model):
         return self.name
 
     @property
-    def rating(self):
+    def avg_rating(self):
         return self.reviews.aggregate(models.Avg('score'))['score__avg']
 
 
@@ -75,10 +67,7 @@ class Review(models.Model):
             MinValueValidator(1)
         ]
     )
-    pub_date = models.DateTimeField(
-        'Дата публикации отзыва на произведение',
-        auto_now_add=True
-    )
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -105,9 +94,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments'
     )
-    pub_date = models.DateTimeField(
-        auto_now_add=True
-    )
+    pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-id']
@@ -117,14 +104,8 @@ class Comment(models.Model):
 
 
 class GenreTitle(models.Model):
-    title = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE
-    )
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.CASCADE
-    )
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-id']

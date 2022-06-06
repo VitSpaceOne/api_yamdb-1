@@ -1,8 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
-
-from .views import sign_up, retrieve_token, UsersViewSet
+from .views import UsersViewSet, retrieve_token, sign_up
 
 router = SimpleRouter()
 
