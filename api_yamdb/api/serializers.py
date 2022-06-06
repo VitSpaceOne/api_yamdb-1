@@ -1,9 +1,6 @@
 import datetime
-from wsgiref.util import request_uri
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from django.db.models import Avg
 
 from reviews.models import (
     Category,
@@ -61,9 +58,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         return value
 
     def get_rating(self, obj):
-        if not obj.reviews.all().exists():
-            return None
-        return obj.reviews.aggregate(Avg('score'))['score__avg']
+        return obj.rating
 
 
 class ReviewsSerializer(serializers.ModelSerializer):

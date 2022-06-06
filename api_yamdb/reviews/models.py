@@ -52,6 +52,10 @@ class Title(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def rating(self):
+        return self.reviews.aggregate(models.Avg('score'))['score__avg']
+
 
 class Review(models.Model):
     title = models.ForeignKey(
