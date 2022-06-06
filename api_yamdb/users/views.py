@@ -56,7 +56,7 @@ def retrieve_token(request):
             access = AccessToken.for_user(user)
             return Response(
                 {
-                        'token': str(access)
+                    'token': str(access)
                 },
                 status=status.HTTP_200_OK
             )
@@ -85,11 +85,7 @@ class UsersViewSet(viewsets.ModelViewSet):
             serializer = serializer_class(user)
             return Response(serializer.data)
 
-        serializer = serializer_class(
-                user,
-                partial=True,
-                data=request.data
-            )
+        serializer = serializer_class(user, partial=True, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
