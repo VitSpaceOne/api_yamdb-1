@@ -13,19 +13,21 @@ from .serializers import (
 from .filters import TitleFilter
 
 from reviews.models import Category, Genre, Title, Review
-from users.permissions import Owner, Moderator, Superuser, Admin, ReadOnly
+from users.permissions import User, Moderator, Superuser, Admin, ReadOnly
 
 
 class CategoriesViewSet(ListCreateDeleteViewSet):
     queryset = Category.objects.all()
     serializer_class = CategoriesSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [Superuser | Admin | ReadOnly]
 
 
 class GenresViewSet(ListCreateDeleteViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenresSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [Superuser | Admin | ReadOnly]
 
 
 class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
@@ -53,7 +55,7 @@ class TitlesViewSet(ListCreateRetrieveUpdateDeleteViewSet):
 
 class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = ReviewsSerializer
-    permission_classes = [Superuser | Admin | Moderator | Owner | ReadOnly]
+    permission_classes = [Superuser | Admin | Moderator | User | ReadOnly]
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -66,7 +68,7 @@ class ReviewViewSet(ListCreateRetrieveUpdateDeleteViewSet):
 
 class CommentViewSet(ListCreateRetrieveUpdateDeleteViewSet):
     serializer_class = CommentsSerializer
-    permission_classes = [Superuser | Admin | Moderator | Owner | ReadOnly]
+    permission_classes = [Superuser | Admin | Moderator | User | ReadOnly]
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
