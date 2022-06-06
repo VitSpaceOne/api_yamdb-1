@@ -1,6 +1,8 @@
 import datetime
 from rest_framework import serializers
 
+from django.db.models import Avg
+
 from reviews.models import (
     Category,
     Genre,
@@ -27,6 +29,7 @@ class GenresSerializer(serializers.ModelSerializer):
 class TitlesSerializer(serializers.ModelSerializer):
     category = CategoriesSerializer(read_only=True)
     genre = GenresSerializer(read_only=True, many=True)
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
@@ -58,6 +61,11 @@ class TitlesSerializer(serializers.ModelSerializer):
                 'Год выпуска не может быть больше текущего'
             )
         return value
+
+    def get_rating(self, obj):
+        if not obj.reviews.all().exists():
+            return None
+        return obj.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
