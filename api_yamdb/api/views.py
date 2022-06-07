@@ -42,7 +42,7 @@ class TitlesViewSet(TitleReviewCommentViewSet):
         serializer.save(category=category, genre=genre)
 
 
-class ReviewViewSet(TitleReviewCommentViewSet):
+class ReviewsViewSet(TitleReviewCommentViewSet):
     serializer_class = ReviewsSerializer
     permission_classes = [Superuser | Admin | Moderator | User | ReadOnly]
 
@@ -55,7 +55,7 @@ class ReviewViewSet(TitleReviewCommentViewSet):
         serializer.save(author=self.request.user, title=title)
 
 
-class CommentViewSet(TitleReviewCommentViewSet):
+class CommentsViewSet(TitleReviewCommentViewSet):
     serializer_class = CommentsSerializer
     permission_classes = [Superuser | Admin | Moderator | User | ReadOnly]
 
