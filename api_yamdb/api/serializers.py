@@ -30,7 +30,7 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     def validate_genre(self, value):
         for slug in value:
-            if not Genre.objects.get(slug=slug).exists():
+            if not get_object_or_404(Genre, slug=slug):
                 raise serializers.ValidationError(
                     "Указанный жанр не существует"
                 )
@@ -39,7 +39,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     def validate_category(self, value):
         if not (
             self.request.data.get('category')
-            and Category.objects.get(slug=value).exists()
+            and get_object_or_404(Category, slug=value)
         ):
             raise serializers.ValidationError(
                 "Указанная категория не существует"
