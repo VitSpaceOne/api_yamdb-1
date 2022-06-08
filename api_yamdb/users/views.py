@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
@@ -17,32 +18,30 @@ User = get_user_model()
 
 @api_view(['POST'])
 def sign_up(request):
-    serializer = UserSerializer(data=request.data)
 
-    if serializer.is_valid():
-
-        username = request.data['username']
-        email = request.data['email']
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
+    username = request.data.get('username')
+    email = request.data.get('email')
+    try:
+        user = User.objects.get(username=username, email=email)
+    except User.DoesNotExist:
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
             user = serializer.save()
-        token = generate_token(user)
-        send_mail(
-            'Yamdb confirmation code',
-            f'{token}',
-            'auth@yamdb.com',
-            [f'{email}']
-        )
+    token = generate_token(user)
+    send_mail(
+        'Yamdb confirmation code',
+        f'{token}',
+        settings.AUTH_EMAIL,
+        [f'{email}']
+    )
 
-        return Response(
-            {
-                "username": username,
-                "email": email
-            },
-            status=status.HTTP_200_OK
-        )
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {
+            "username": username,
+            "email": email
+        },
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['POST'])
@@ -78,7 +77,7 @@ class UsersViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def me(self, request):
-        user = User.objects.get(pk=request.user.id)
+        user = request.user
         serializer_class = UserSelfSerializer
 
         if request.method == 'GET':

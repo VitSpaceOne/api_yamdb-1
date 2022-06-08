@@ -4,8 +4,8 @@ from users.models import User
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=256, db_index=True)
+    slug = models.SlugField(unique=True, db_index=True)
 
     class Meta:
         ordering = ['-id']
@@ -15,8 +15,8 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=256, db_index=True)
+    slug = models.SlugField(unique=True, db_index=True)
 
     class Meta:
         ordering = ['-id']
@@ -26,16 +26,17 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=200)
-    year = models.IntegerField()
+    name = models.CharField(max_length=200, db_index=True)
+    year = models.IntegerField(db_index=True)
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         related_name='titles',
         blank=True,
-        null=True
+        null=True,
+        db_index=True
     )
-    genre = models.ManyToManyField(Genre, through='GenreTitle')
+    genre = models.ManyToManyField(Genre, through='GenreTitle', db_index=True)
     description = models.TextField(blank=True)
 
     class Meta:
