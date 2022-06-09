@@ -10,7 +10,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .permissions import Admin, Superuser
-from .serializers import UserSelfSerializer, UserSerializer
+from .serializers import (UserSelfSerializer, UserSerializer,
+                          UserSignUpSerializer)
 from .services import check_token, generate_token
 
 User = get_user_model()
@@ -46,12 +47,10 @@ def sign_up(request):
 
 @api_view(['POST'])
 def retrieve_token(request):
-    if (
-        'username' in request.data
-        and 'confirmation_code' in request.data
-    ):
-        user = get_object_or_404(User, username=request.data['username'])
-        if check_token(user, request.data['confirmation_code']):
+    serializer = UserSignUpSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user = get_object_or_404(User, username=request.data.get('username'))
+        if check_token(user, request.data.get('confirmation_code')):
             access = AccessToken.for_user(user)
             return Response(
                 {
@@ -60,7 +59,6 @@ def retrieve_token(request):
                 status=status.HTTP_200_OK
             )
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UsersViewSet(viewsets.ModelViewSet):

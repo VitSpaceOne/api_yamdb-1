@@ -1,5 +1,7 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -11,6 +13,11 @@ FIELDS = (
     'bio',
     'role'
 )
+
+
+class UserSignUpSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
 
 
 class UserSerializer(serializers.ModelSerializer):
