@@ -58,7 +58,12 @@ def retrieve_token(request):
                 },
                 status=status.HTTP_200_OK
             )
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                'confirmation_code': 'Confirmation code is invalid'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class UsersViewSet(viewsets.ModelViewSet):
