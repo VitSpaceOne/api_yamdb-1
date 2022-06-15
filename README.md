@@ -1,5 +1,6 @@
 # api_yamdb
 This project I've created during the course with the toy team of two developers. As a toy teamlead I described and separated tasks between developers, made architectural decision and defended the project during review. About 50% of code is written by me. I fully wrote users app, but I also contributed a lot to api app.
+
 Project contains three apps: reviews, api, users. reviews app implement models, api app implements access to models via api, users app implements all the logic that needed for user management and access: permissions, singup and token endpoints. Full description of endpoints and queries are available on /redoc/
 
 ## Run application locally
