@@ -60,7 +60,7 @@ def retrieve_token(request):
             )
         return Response(
             {
-                'confirmation_code': 'Confirmation code is invalid'
+                'confirmation_code': "Confirmation code is invalid"
             },
             status=status.HTTP_400_BAD_REQUEST
         )

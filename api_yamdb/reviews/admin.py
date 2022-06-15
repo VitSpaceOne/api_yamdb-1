@@ -33,7 +33,7 @@ class TitleAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     list_filter = ('name', 'genre')
-    empty_value_display = '-пусто-'
+    empty_value_display = '-empty-'
 
 
 class GenreAdmin(admin.ModelAdmin):
@@ -71,7 +71,7 @@ class GenreTitleAdmin(admin.ModelAdmin):
         'title',
         'genre'
     )
-    empty_value_display = '-пусто-'
+    empty_value_display = '-empty-'
 
 
 admin.site.register(User, UserAdmin)

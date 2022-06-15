@@ -32,7 +32,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         for slug in value:
             if not get_object_or_404(Genre, slug=slug):
                 raise serializers.ValidationError(
-                    "Указанный жанр не существует"
+                    "Specified genre doesn't exists"
                 )
         return value
 
@@ -42,7 +42,7 @@ class TitlesSerializer(serializers.ModelSerializer):
             and get_object_or_404(Category, slug=value)
         ):
             raise serializers.ValidationError(
-                "Указанная категория не существует"
+                "Specified category doesn't exists"
             )
         return value
 
@@ -50,7 +50,7 @@ class TitlesSerializer(serializers.ModelSerializer):
         current_year = datetime.date.today().year
         if value > current_year:
             raise serializers.ValidationError(
-                'Год выпуска не может быть больше текущего'
+                "The year can't be greater then current"
             )
         return value
 
@@ -78,13 +78,15 @@ class ReviewsSerializer(serializers.ModelSerializer):
             request.method == 'POST'
             and user.reviews.filter(title=title).exists()
         ):
-            raise serializers.ValidationError("Нельзя оставить второй отзыв")
+            raise serializers.ValidationError(
+                "Can't leave second review to one title"
+            )
         return data
 
     def validate_score(self, value):
         if 0 >= value >= 10:
             raise serializers.ValidationError(
-                'Оценка за пределами допустимого диапазона'
+                "The score is outside allowed range"
             )
         return value
 

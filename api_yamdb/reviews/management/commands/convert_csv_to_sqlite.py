@@ -6,11 +6,11 @@ from users.models import User
 
 
 class Command(BaseCommand):
-    help = 'Загрузить данные из CSV файлов в базу данных'
+    help = 'Upload data from .csv files to database'
 
     def handle(self, *args, **options):
         self.stdout.write(
-            self.style.SUCCESS('Загрузка данных из CSV файлов начата')
+            self.style.SUCCESS('Data uploading has started')
         )
 
         for row in DictReader(
@@ -94,5 +94,5 @@ class Command(BaseCommand):
             comment.save()
 
         self.stdout.write(
-            self.style.SUCCESS('Загрузка данных из CSV файлов завершена')
+            self.style.SUCCESS('Data uploading has finished')
         )
