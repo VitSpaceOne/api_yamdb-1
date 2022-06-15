@@ -1,51 +1,53 @@
 # api_yamdb
-> Проект содержит три приложения: reviews, api, users. Приложение reviews содержит модели сервиса, приложение api предоставляет доступ к моделям через API, а в приложениии users реализована вся логика для управления ролями и выдачи доступов: пермишены, эндпоинты для регистрации и получения токена. Подробное описание запросов доступно по адресу /redoc/
+This project I've created during the course with the toy team of two developers. As a toy teamlead I described and separated tasks between developers, made architectural decision and defended the project during review. About 50% of code is written by me. I fully wrote users app, but I also contributed a lot to api app.
+Project contains three apps: reviews, api, users. reviews app implement models, api app implements access to models via api, users app implements all the logic that needed for user management and access: permissions, singup and token endpoints. Full description of endpoints and queries are available on /redoc/
 
-## Локальное развертывание приложения
-Создать и активировать виртуальное окружение.
-В виртуальном окружении, в директории /api_yamdb/api_yamdb/ выполнить команды:
+## Run application locally
+Create and activate virtual enviroment
+In /api_yamdb/api_yamdb/ run commands:
 ```
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
 ```
 
-## Приложение users
-В приложении реализована расширенная модель пользователя, права для управления доступами до основных эндпоинтов и API для управления пользователями.
+## users app
+It the application implemented extended user model, permissions and API to users management for users as well as for admins.
 
-### Роли
-- Аноним — может просматривать описания произведений, читать отзывы и комментарии.
-- Аутентифицированный пользователь (user) — может, как и Аноним, читать всё, дополнительно он может публиковать отзывы и ставить оценку произведениям (фильмам/книгам/песенкам), может комментировать чужие отзывы; может редактировать и удалять свои отзывы и комментарии. Эта роль присваивается по умолчанию каждому новому пользователю.
-- Модератор (moderator) — те же права, что и у Аутентифицированного пользователя плюс право удалять любые отзывы и комментарии.
-- Администратор (admin) — полные права на управление всем контентом проекта. Может создавать и удалять произведения, категории и жанры. Может назначать роли пользователям.
-- Суперюзер Django — обладет правами администратора (admin)
+### Roles
+- Anonim — can get titles decriptions, reviews and comments
+- Authenticated user (user) — as well as Anonim can get all and additionally can publish reviews and scores to titles, can comment another reviews. This role is granted by default
+- Moderator — has same rights with authenticated user and additionally can delete any reviews and comments
+- Admin — has full rights to manage a content. Can created and delete titles, cateogries, genres, can manage other users
+- Django Superusers — has same rights with admin, but role can't be changed
 
-### Эндпоинты
+### Endpoints
 
-- /auth/singup/ — регистрация нового пользователя
-- /auth/token/ — получение токена
+- /auth/singup/ — sign up new user
+- /auth/token/ — retrieve token
 
-Алгоритм регистрации пользователя устроен следующим образом:
-1. Пользователь отправляет username и email с помощью POST-запроса.
-2. Стандартным генератором Django PasswordResetTokenGenerator генерируется токен, который отправляется на почту пользователя. Этот токен нужен для получения JWT-токена, с которым пользователь будет обращаться к основным эндпоинтам сервиса.
-3. Пользователь отправляет username и токен в поле confirmation_code с помощью POST-запроса и получает в ответе JWT-токен, если данные валидны.
+Sign up and authentication algorithm:
+1. User sends an email and user name using POST
+2. Default Django PasswordResetTokenGenerator generates token, that sends to user's email. This token is required to retrieve JWT-token that is needed to send queries to base endpoints
+3. The user sends username and token given on email using 'confirmation_code' field using POST and retrieves JWT-token if data is valid
 
-- /users/ — коллекция пользователей, обрабатывает все запросы кроме PUT
-- /users/me/ — эндпоинт для получения и изменения данных о самом себе
+- /users/ — users collection, handles all queries except PUT
+- /users/me/ — endpoint for getting and managing data about yourself
 
-## Приложение reviews
-### Модели
-В приложении реализованы модели для следующих ресурсов API YaMDb:
-- Category - категории (типы) произведений (например: «Фильмы», «Книги», «Музыка»);
-- Genre - жанры произведений, одно произведение может быть привязано к нескольким жанрам;
-- Title - произведения, к которым пишут отзывы (определённый фильм, книга или песенка);
-- Review - отзывы на произведения, отзыв привязан к определённому произведению;
-- Comment - комментарии к отзывам, комментарий привязан к определённому отзыву;
-- GenreTitle - модель для связи произведений к жанрам.
+## reviews app
 
-### Загрузка тестовых данных
-В проекте API YaMDb в директории /api_yamdb/static/data подготовлены несколько файлов в формате csv с тестовым контентом для ресурсов Users, Titles, Categories, Genres, Review и Comments.
-Для загрузки данных выполните в терминале management-команду:
+### Models
+The app implements models for API:
+- Category - categories (types) of titles (ex: "Film", "Book", "Music");
+- Genre - genres of titles, one title might be related with few genres;
+- Title - specified titles, to which users write reviews (to film, book, song);
+- Review - reviews to titles;
+- Comment - comments to reviews;
+- GenreTitle - additional model for implementing Title-Genre many-to-many relationship;
+
+### Test data uploading
+In the directory /api_yamdb/static/data are prepared .csv files with the test data could be used for resources
+To upload test data run following command:
 ```
 py manage.py convert_csv_to_sqlite
 ```
