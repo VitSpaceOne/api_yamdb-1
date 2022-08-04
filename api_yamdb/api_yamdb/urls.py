@@ -1,6 +1,8 @@
+from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls import url
 from django.views.generic import TemplateView
+
 
 from rest_framework import permissions
 from drf_yasg import openapi
@@ -12,7 +14,6 @@ schema_view = get_schema_view(
         title='Yamdb API',
         default_version='v1',
         description='Yamdb API docs',
-        # contact=openapi.Contact(telegram='bogdanburich')
     ),
     public=True,
     permission_classes=(permissions.AllowAny,)
@@ -33,6 +34,7 @@ urlpatterns = [
         TemplateView.as_view(template_name='redoc.html'),
         name='redoc'
     ),
+    path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
     path('api/', include('api.urls')),
 ]
